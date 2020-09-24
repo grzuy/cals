@@ -4,6 +4,18 @@ CALENDAR_NAME = "cal-wc-2020-qualy"
 HOURS_PER_DAY = 24
 HOURS_PER_MATCH = (45 + 15 + 50)/60.0
 DEFAULT_TZID = "America/Montevideo"
+EMOJIS = {
+  "ARG" => "🇦🇷",
+  "BRA" => "🇧🇷",
+  "BOL" => "🇧🇴",
+  "CHI" => "🇨🇱",
+  "COL" => "🇨🇴",
+  "ECU" => "🇪🇨",
+  "PAR" => "🇵🇾",
+  "PER" => "🇵🇪",
+  "URU" => "🇺🇾",
+  "VEN" => "🇻🇪"
+}
 
 def define_timezone(calendar, id, offset)
   calendar.timezone do |t|
@@ -24,7 +36,7 @@ def define_match(calendar, team1, team2, year, month, day, hour, minute, tzid = 
     e.dtstart = start_time
     e.dtstart = Icalendar::Values::DateTime.new(start_time, "tzid" => tzid)
     e.dtend = Icalendar::Values::DateTime.new(start_time + HOURS_PER_MATCH/HOURS_PER_DAY.to_f, "tzid" => tzid)
-    e.summary = "#{team1} v #{team2}"
+    e.summary = "#{team1} #{EMOJIS[team1]} v #{EMOJIS[team2]} #{team2}"
   end
 end
 
