@@ -17,6 +17,13 @@ EMOJIS = {
   "VEN" => "🇻🇪"
 }
 
+def define_calendar(name)
+  cal = Icalendar::Calendar.new
+  cal.append_custom_property("X-WR-CALNAME", name)
+
+  cal
+end
+
 def define_timezone(calendar, id, offset)
   calendar.timezone do |t|
     t.tzid = id
@@ -40,7 +47,7 @@ def define_match(calendar, team1, team2, year, month, day, hour, minute, tzid = 
   end
 end
 
-calendar = Icalendar::Calendar.new
+calendar = define_calendar("Eliminatorias CONMEBOL")
 
 define_timezone(calendar, DEFAULT_TZID, "-0300")
 
