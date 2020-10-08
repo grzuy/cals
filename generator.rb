@@ -53,14 +53,14 @@ define_timezone(calendar, DEFAULT_TZID, "-0300")
 
 define_match(calendar, "PAR", "PER", 2020, 10, 8, 19, 30)
 define_match(calendar, "URU", "CHI", 2020, 10, 8, 19, 45)
-define_match(calendar, "ARG", "ECU", 2020, 10, 8, 21, 10)
+define_match(calendar, "ARG", "ECU", 2020, 10, 8, 21, 30)
 define_match(calendar, "COL", "VEN", 2020, 10, 9, 20, 30)
 define_match(calendar, "BRA", "BOL", 2020, 10, 9, 21, 30)
 
 define_match(calendar, "BOL", "ARG", 2020, 10, 13, 17, 0)
 define_match(calendar, "ECU", "URU", 2020, 10, 13, 18, 0)
 define_match(calendar, "VEN", "PAR", 2020, 10, 13, 19, 0)
+define_match(calendar, "PER", "BRA", 2020, 10, 13, 21, 0)
 define_match(calendar, "CHI", "COL", 2020, 10, 13, 21, 30)
-define_match(calendar, "PER", "BRA", 2020, 10, 13, 23, 15)
 
 File.write("#{CALENDAR_NAME}.ics", calendar.to_ical)
