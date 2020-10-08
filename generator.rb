@@ -63,4 +63,6 @@ define_match(calendar, "VEN", "PAR", 2020, 10, 13, 19, 0)
 define_match(calendar, "PER", "BRA", 2020, 10, 13, 21, 0)
 define_match(calendar, "CHI", "COL", 2020, 10, 13, 21, 30)
 
+define_match(calendar, "BRA", "VEN", 2020, 11, 14, 21, 30)
+
 File.write("#{CALENDAR_NAME}.ics", calendar.to_ical)
