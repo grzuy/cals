@@ -82,22 +82,24 @@ doc.css(".fi-mu-list").each do |match_group|
     daymonth = score.get_attribute("data-daymonthutc")
 
     if daymonth
-      day = daymonth[0..1]
       month = daymonth[2..3]
-
+      day = daymonth[0..1]
       time = score.get_attribute("data-timeutc")
-
-      define_match(
-        calendar,
-        home_team,
-        away_team,
-        year.to_i,
-        month.to_i,
-        day.to_i,
-        (time[0..1].to_i if time),
-        (time[3..4].to_i if time)
-      )
+    else
+      month = match_group_date[4..5]
+      day = match_group_date[6..7]
     end
+
+    define_match(
+      calendar,
+      home_team,
+      away_team,
+      year.to_i,
+      month.to_i,
+      day.to_i,
+      (time[0..1].to_i if time),
+      (time[3..4].to_i if time)
+    )
   end
 end
 
