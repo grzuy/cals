@@ -3,7 +3,7 @@ require "icalendar"
 CALENDAR_NAME = "cal-wc-2020-qualy"
 HOURS_PER_DAY = 24
 HOURS_PER_MATCH = (45 + 15 + 50)/60.0
-DEFAULT_TZID = "America/Montevideo"
+DEFAULT_TZID = "UTC"
 EMOJIS = {
   "ARG" => "🇦🇷",
   "BRA" => "🇧🇷",
@@ -36,13 +36,22 @@ def define_timezone(calendar, id, offset)
   end
 end
 
-def define_match(calendar, team1, team2, year, month, day, hour, minute, tzid = DEFAULT_TZID)
-  start_time = DateTime.new(year, month, day, hour, minute)
+def define_match(calendar, team1, team2, year, month, day, hour = nil, minute = nil, tzid = DEFAULT_TZID)
+  if hour && minute
+    start_time = DateTime.new(year, month, day, hour, minute)
+  else
+    start_date = Date.new(year, month, day)
+  end
 
   calendar.event do |e|
-    e.dtstart = start_time
-    e.dtstart = Icalendar::Values::DateTime.new(start_time, "tzid" => tzid)
-    e.dtend = Icalendar::Values::DateTime.new(start_time + HOURS_PER_MATCH/HOURS_PER_DAY.to_f, "tzid" => tzid)
+    if start_date
+      e.dtstart = Icalendar::Values::Date.new(start_date)
+      e.dtend = Icalendar::Values::Date.new(start_date)
+    elsif start_time
+      e.dtstart = Icalendar::Values::DateTime.new(start_time, "tzid" => tzid)
+      e.dtend = Icalendar::Values::DateTime.new(start_time + HOURS_PER_MATCH/HOURS_PER_DAY.to_f, "tzid" => tzid)
+    end
+
     e.summary = "#{team1} #{EMOJIS[team1]} v #{EMOJIS[team2]} #{team2}"
   end
 end
@@ -51,18 +60,45 @@ calendar = define_calendar("Eliminatorias CONMEBOL")
 
 define_timezone(calendar, DEFAULT_TZID, "-0300")
 
-define_match(calendar, "PAR", "PER", 2020, 10, 8, 19, 30)
-define_match(calendar, "URU", "CHI", 2020, 10, 8, 19, 45)
-define_match(calendar, "ARG", "ECU", 2020, 10, 8, 21, 30)
-define_match(calendar, "COL", "VEN", 2020, 10, 9, 20, 30)
-define_match(calendar, "BRA", "BOL", 2020, 10, 9, 21, 30)
+require "nokogiri"
+require "httparty"
 
-define_match(calendar, "BOL", "ARG", 2020, 10, 13, 17, 0)
-define_match(calendar, "ECU", "URU", 2020, 10, 13, 18, 0)
-define_match(calendar, "VEN", "PAR", 2020, 10, 13, 19, 0)
-define_match(calendar, "PER", "BRA", 2020, 10, 13, 21, 0)
-define_match(calendar, "CHI", "COL", 2020, 10, 13, 21, 30)
+MATCHES_URL = "https://www.fifa.com/worldcup/preliminaries/_libraries/season/282735/stage/282737/_matchlist"
 
-define_match(calendar, "BRA", "VEN", 2020, 11, 14, 21, 30)
+doc = Nokogiri::HTML(HTTParty.get(MATCHES_URL))
+
+doc.css(".fi-mu-list").each do |match_group|
+  match_group_date = match_group.get_attribute("data-matchesdate")
+  year = match_group_date[0..3]
+
+  match_group.css(".fi-mu").each do |match|
+    info = match.at(".fi-mu__info")
+    m = match.at(".fi-mu__m")
+
+    home_team = m.at(".home .fi-t__nTri").text
+    away_team = m.at(".away .fi-t__nTri").text
+
+    score = match.at(".fi-s__score")
+    daymonth = score.get_attribute("data-daymonthutc")
+
+    if daymonth
+      day = daymonth[0..1]
+      month = daymonth[2..3]
+
+      time = score.get_attribute("data-timeutc")
+
+      define_match(
+        calendar,
+        home_team,
+        away_team,
+        year.to_i,
+        month.to_i,
+        day.to_i,
+        (time[0..1].to_i if time),
+        (time[3..4].to_i if time)
+      )
+    end
+  end
+end
 
 File.write("#{CALENDAR_NAME}.ics", calendar.to_ical)
