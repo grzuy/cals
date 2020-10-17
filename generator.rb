@@ -36,7 +36,19 @@ def define_timezone(calendar, id, offset)
   end
 end
 
-def define_match(calendar, team1, team2, year, month, day, hour = nil, minute = nil, tzid = DEFAULT_TZID)
+def define_match(
+  calendar,
+  team1,
+  team2,
+  year,
+  month,
+  day,
+  hour = nil,
+  minute = nil,
+  tzid = DEFAULT_TZID,
+  stadium: nil,
+  city: nil
+)
   if hour && minute
     start_time = DateTime.new(year, month, day, hour, minute)
   else
@@ -53,6 +65,7 @@ def define_match(calendar, team1, team2, year, month, day, hour = nil, minute = 
     end
 
     e.summary = "#{team1} #{EMOJIS[team1]} v #{EMOJIS[team2]} #{team2}"
+    e.location = [stadium, city].compact.join(", ")
   end
 end
 
@@ -78,6 +91,9 @@ doc.css(".fi-mu-list").each do |match_group|
     home_team = m.at(".home .fi-t__nTri").text
     away_team = m.at(".away .fi-t__nTri").text
 
+    stadium = info.at(".fi__info__stadium")&.text
+    city = info.at(".fi__info__venue")&.text
+
     score = match.at(".fi-s__score")
     daymonth = score.get_attribute("data-daymonthutc")
 
@@ -98,7 +114,9 @@ doc.css(".fi-mu-list").each do |match_group|
       month.to_i,
       day.to_i,
       (time[0..1].to_i if time),
-      (time[3..4].to_i if time)
+      (time[3..4].to_i if time),
+      stadium: stadium,
+      city: city
     )
   end
 end
