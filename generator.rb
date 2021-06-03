@@ -1,77 +1,9 @@
-require "icalendar"
+require "./tournament_calendar"
 
-CALENDAR_NAME = "cal-wc-2020-qualy"
-HOURS_PER_DAY = 24
-HOURS_PER_MATCH = (45 + 15 + 50)/60.0
 DEFAULT_TZID = "UTC"
-EMOJIS = {
-  "ARG" => "🇦🇷",
-  "BRA" => "🇧🇷",
-  "BOL" => "🇧🇴",
-  "CHI" => "🇨🇱",
-  "COL" => "🇨🇴",
-  "ECU" => "🇪🇨",
-  "PAR" => "🇵🇾",
-  "PER" => "🇵🇪",
-  "URU" => "🇺🇾",
-  "VEN" => "🇻🇪"
-}
 
-def define_calendar(name)
-  cal = Icalendar::Calendar.new
-  cal.append_custom_property("X-WR-CALNAME", name)
-
-  cal
-end
-
-def define_timezone(calendar, id, offset)
-  calendar.timezone do |t|
-    t.tzid = id
-
-    t.standard do |s|
-      s.tzoffsetfrom = offset
-      s.tzoffsetto = offset
-      s.dtstart = "19701101T020000"
-    end
-  end
-end
-
-def define_match(
-  calendar,
-  team1,
-  team2,
-  year,
-  month,
-  day,
-  hour = nil,
-  minute = nil,
-  tzid = DEFAULT_TZID,
-  stadium: nil,
-  city: nil
-)
-  if hour && minute
-    start_time = DateTime.new(year, month, day, hour, minute)
-  else
-    start_date = Date.new(year, month, day)
-  end
-
-  calendar.event do |e|
-    if start_date
-      e.dtstart = Icalendar::Values::Date.new(start_date)
-      e.dtend = Icalendar::Values::Date.new(start_date)
-    elsif start_time
-      e.dtstart = Icalendar::Values::DateTime.new(start_time, "tzid" => tzid)
-      e.dtend = Icalendar::Values::DateTime.new(start_time + HOURS_PER_MATCH/HOURS_PER_DAY.to_f, "tzid" => tzid)
-    end
-
-    e.summary = "#{team1} #{EMOJIS[team1]} v #{EMOJIS[team2]} #{team2}"
-    e.location = [stadium, city].compact.join(", ")
-  end
-end
-
-calendar = define_calendar("Eliminatorias CONMEBOL")
-
-define_timezone(calendar, DEFAULT_TZID, "-0300")
+calendar = TournamentCalendar.new("Eliminatorias CONMEBOL")
+calendar.define_timezone(DEFAULT_TZID, "-0300")
 
 require "nokogiri"
 require "httparty"
@@ -106,8 +38,7 @@ doc.css(".fi-mu-list").each do |match_group|
       day = match_group_date[6..7]
     end
 
-    define_match(
-      calendar,
+    calendar.define_match(
       home_team,
       away_team,
       year.to_i,
@@ -115,10 +46,11 @@ doc.css(".fi-mu-list").each do |match_group|
       day.to_i,
       (time[0..1].to_i if time),
       (time[3..4].to_i if time),
-      stadium: stadium,
-      city: city
+      DEFAULT_TZID,
+      stadium,
+      city
     )
   end
 end
 
-File.write("#{CALENDAR_NAME}.ics", calendar.to_ical)
+File.write("cal-wc-2020-qualy.ics", calendar.to_ical)
