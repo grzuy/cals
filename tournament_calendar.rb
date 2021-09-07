@@ -1,6 +1,7 @@
 require "icalendar"
 
 class TournamentCalendar
+  URY_TZID = "America/Montevideo"
   HOURS_PER_DAY = 24
   HOURS_PER_MATCH = (45 + 15 + 50)/60.0
   EMOJIS = {
@@ -40,7 +41,7 @@ class TournamentCalendar
     day,
     hour = nil,
     minute = nil,
-    tzid = DEFAULT_TZID,
+    tzid = URY_TZID,
     stadium = nil,
     city = nil
   )

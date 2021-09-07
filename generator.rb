@@ -1,56 +1,91 @@
 require "./tournament_calendar"
 
-DEFAULT_TZID = "UTC"
+URY_TZID = "America/Montevideo"
+
+default_venues = {
+  PAR: ["Estadio Defensores del Chaco", "Asunción"],
+  URU: ["Estadio Centenario", "Montevideo"],
+  ARG: ["Estadio La Bombonera", "Buenos Aires"],
+  PER: ["Estadio Nacional", "Lima"],
+  CHI: ["Estadio Nacional", "Santiago de Chile"],
+  BOL: ["Estadio Hernando Siles", "La Paz"],
+  ECU: ["Estadio Rodrigo Paz Delgado", "Quito"],
+  VEN: ["Estadio Olímpico de la UCV", "Caracas"],
+  COL: ["Estadio Metropolitano Roberto Meléndez", "Barranquilla"]
+}
 
 calendar = TournamentCalendar.new("Eliminatorias CONMEBOL")
-calendar.define_timezone(DEFAULT_TZID, "-0300")
 
-require "nokogiri"
-require "httparty"
+calendar.define_match("PAR", "PER", 2020, 10, 8, 19, 30, URY_TZID, *default_venues[:PAR])
+calendar.define_match("URU", "CHI", 2020, 10, 8, 19, 45, URY_TZID, *default_venues[:URU])
+calendar.define_match("ARG", "ECU", 2020, 10, 8, 21, 30, URY_TZID, *default_venues[:ARG])
+calendar.define_match("COL", "VEN", 2020, 10, 9, 20, 30, URY_TZID, *default_venues[:COL])
+calendar.define_match("BRA", "BOL", 2020, 10, 9, 21, 30, URY_TZID, "Arena Corinthians", "São Paulo")
 
-MATCHES_URL = "https://www.fifa.com/worldcup/preliminaries/_libraries/season/282735/stage/282737/_matchlist"
+calendar.define_match("BOL", "ARG", 2020, 10, 13, 17, 00, URY_TZID, *default_venues[:BOL])
+calendar.define_match("ECU", "URU", 2020, 10, 13, 18, 00, URY_TZID, *default_venues[:ECU])
+calendar.define_match("VEN", "PAR", 2020, 10, 13, 19, 00, URY_TZID, "Estadio Metropolitano de Mérida", "Mérida")
+calendar.define_match("PER", "BRA", 2020, 10, 13, 21, 00, URY_TZID, *default_venues[:PER])
+calendar.define_match("CHI", "COL", 2020, 10, 13, 21, 30, URY_TZID, *default_venues[:CHI])
 
-doc = Nokogiri::HTML(HTTParty.get(MATCHES_URL))
+calendar.define_match("BOL", "ECU", 2020, 11, 12, 17, 00, URY_TZID, *default_venues[:BOL])
+calendar.define_match("ARG", "PAR", 2020, 11, 12, 21, 00, URY_TZID, *default_venues[:ARG])
+calendar.define_match("COL", "URU", 2020, 11, 13, 17, 30, URY_TZID, *default_venues[:COL])
+calendar.define_match("CHI", "PER", 2020, 11, 13, 20, 00, URY_TZID, *default_venues[:CHI])
+calendar.define_match("BRA", "VEN", 2020, 11, 13, 21, 30, URY_TZID, "Estadio Morumbi", "São Paulo")
 
-doc.css(".fi-mu-list").each do |match_group|
-  match_group_date = match_group.get_attribute("data-matchesdate")
-  year = match_group_date[0..3]
+calendar.define_match("ECU", "COL", 2020, 11, 17, 18, 00, URY_TZID, *default_venues[:ECU])
+calendar.define_match("VEN", "CHI", 2020, 11, 17, 18, 00, URY_TZID, *default_venues[:VEN])
+calendar.define_match("URU", "BRA", 2020, 11, 17, 20, 00, URY_TZID, *default_venues[:URU])
+calendar.define_match("PAR", "BOL", 2020, 11, 17, 20, 00, URY_TZID, *default_venues[:PAR])
+calendar.define_match("PER", "ARG", 2020, 11, 17, 21, 30, URY_TZID, *default_venues[:PER])
 
-  match_group.css(".fi-mu").each do |match|
-    info = match.at(".fi-mu__info")
-    m = match.at(".fi-mu__m")
+calendar.define_match("BOL", "VEN", 2021, 6, 3, 17, 00, URY_TZID, *default_venues[:BOL])
+calendar.define_match("URU", "PAR", 2021, 6, 3, 19, 00, URY_TZID, *default_venues[:URU])
+calendar.define_match("ARG", "CHI", 2021, 6, 3, 21, 00, URY_TZID, "Estadio Único Madre de Ciudades", "Santiago del Estero")
+calendar.define_match("PER", "COL", 2021, 6, 3, 23, 00, URY_TZID, *default_venues[:PER])
+calendar.define_match("BRA", "ECU", 2021, 6, 4, 21, 30, URY_TZID, "Estadio Beira-Rio", "Porto Alegre")
 
-    home_team = m.at(".home .fi-t__nTri").text
-    away_team = m.at(".away .fi-t__nTri").text
+calendar.define_match("ECU", "PER", 2021, 6, 8, 18, 00, URY_TZID, *default_venues[:ECU])
+calendar.define_match("VEN", "URU", 2021, 6, 8, 19, 30, URY_TZID, *default_venues[:VEN])
+calendar.define_match("COL", "ARG", 2021, 6, 8, 20, 00, URY_TZID, *default_venues[:COL])
+calendar.define_match("PAR", "BRA", 2021, 6, 8, 21, 30, URY_TZID, *default_venues[:PAR])
+calendar.define_match("CHI", "BOL", 2021, 6, 8, 22, 30, URY_TZID, "Estadio San Carlos de Apoquindo", "Santiago de Chile")
 
-    stadium = info.at(".fi__info__stadium")&.text
-    city = info.at(".fi__info__venue")&.text
+calendar.define_match("BOL", "COL", 2021, 9, 2, 17, 00, URY_TZID, *default_venues[:BOL])
+calendar.define_match("ECU", "PAR", 2021, 9, 2, 18, 00, URY_TZID, *default_venues[:ECU])
+calendar.define_match("VEN", "ARG", 2021, 9, 2, 21, 00, URY_TZID, *default_venues[:VEN])
+calendar.define_match("PER", "URU", 2021, 9, 2, 22, 00, URY_TZID, *default_venues[:PER])
+calendar.define_match("CHI", "BRA", 2021, 9, 2, 22, 00, URY_TZID, "Estadio Monumental David Arellano", "Santiago de Chile")
 
-    score = match.at(".fi-s__score")
-    daymonth = score.get_attribute("data-daymonthutc")
+calendar.define_match("BRA", "ARG", 2021, 9, 5, 16, 00, URY_TZID, "Arena Corinthians", "São Paulo")
+calendar.define_match("ECU", "CHI", 2021, 9, 5, 18, 00, URY_TZID, *default_venues[:ECU])
+calendar.define_match("PAR", "COL", 2021, 9, 5, 19, 00, URY_TZID, *default_venues[:PAR])
+calendar.define_match("URU", "BOL", 2021, 9, 5, 19, 00, URY_TZID, "Estadio Campeón del Siglo", "Montevideo")
+calendar.define_match("PER", "VEN", 2021, 9, 5, 22, 00, URY_TZID, *default_venues[:PER])
 
-    if daymonth
-      month = daymonth[2..3]
-      day = daymonth[0..1]
-      time = score.get_attribute("data-timeutc")
-    else
-      month = match_group_date[4..5]
-      day = match_group_date[6..7]
-    end
+calendar.define_match("PAR", "VEN", 2021, 9, 9, 19, 30, URY_TZID, *default_venues[:PAR])
+calendar.define_match("URU", "ECU", 2021, 9, 9, 19, 30, URY_TZID, "Estadio Campeón del Siglo", "Montevideo")
+calendar.define_match("COL", "CHI", 2021, 9, 9, 20, 00, URY_TZID, *default_venues[:COL])
+calendar.define_match("ARG", "BOL", 2021, 9, 9, 20, 30, URY_TZID, "Estadio Monumental", "Buenos Aires")
+calendar.define_match("BRA", "PER", 2021, 9, 9, 21, 30, URY_TZID, "Arena Pernambuco", "Recife")
 
-    calendar.define_match(
-      home_team,
-      away_team,
-      year.to_i,
-      month.to_i,
-      day.to_i,
-      (time[0..1].to_i if time),
-      (time[3..4].to_i if time),
-      DEFAULT_TZID,
-      stadium,
-      city
-    )
-  end
-end
+calendar.define_match("URU", "COL", 2021, 10, 7)
+calendar.define_match("PER", "CHI", 2021, 10, 7)
+calendar.define_match("VEN", "BRA", 2021, 10, 7)
+calendar.define_match("PAR", "ARG", 2021, 10, 7)
+calendar.define_match("ECU", "BOL", 2021, 10, 7)
+
+calendar.define_match("BOL", "PER", 2021, 10, 10)
+calendar.define_match("VEN", "ECU", 2021, 10, 10)
+calendar.define_match("CHI", "PAR", 2021, 10, 10)
+calendar.define_match("COL", "BRA", 2021, 10, 10)
+calendar.define_match("ARG", "URU", 2021, 10, 10)
+
+calendar.define_match("COL", "ECU", 2021, 10, 14)
+calendar.define_match("BRA", "URU", 2021, 10, 14)
+calendar.define_match("BOL", "PAR", 2021, 10, 14)
+calendar.define_match("ARG", "PER", 2021, 10, 14)
+calendar.define_match("CHI", "VEN", 2021, 10, 14)
 
 File.write("cal-wc-2020-qualy.ics", calendar.to_ical)
